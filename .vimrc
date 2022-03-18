@@ -5,9 +5,7 @@ let s:darwin = has('mac')
 
 silent! if plug#begin('~/.vim/plugged')
 
-if s:darwin
-  let g:plug_url_format = 'git@github.com:%s.git'
-else
+if !s:darwin
   let $GIT_SSL_NO_VERIFY = 'true'
 endif
 
@@ -18,14 +16,15 @@ Plug 'junegunn/fzf.vim'
 if s:darwin
   Plug 'junegunn/vim-xmark'
 endif
-unlet! g:plug_url_format
 
-Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --clang-completer --go-completer' }
+function! BuildYCM(info)
+  if a:info.status == 'installed' || a:info.force
+    !./install.py --clang-completer --gocode-completer
+  endif
+endfunction
+Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': function('BuildYCM') }
 Plug 'tpope/vim-fugitive'
-if v:version >= 703
-  Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
-endif
-Plug 'majutsushi/tagbar'
+Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 Plug 'rust-lang/rust.vim'
 
 call plug#end()
@@ -34,28 +33,28 @@ endif
 filetype plugin indent on
 syntax on
 
+set encoding=utf-8
+set number
+set cursorline
+set hlsearch
+set incsearch
+set mouse=a
+set backspace=indent,eol,start
+set whichwrap+=<,>,[,]
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+set laststatus=2
+set list
+set listchars=tab:>·,trail:·
+
 set background=dark
 let g:seoul256_background = 233
 silent! colo seoul256
 
 autocmd FileType gitcommit set textwidth=72
 set hidden
-
-imap jj <Esc>
-set backspace=indent,eol,start
-set laststatus=0
-set number
-
-set list
-set listchars=tab:>·,trail:·
-
-set hlsearch
-set incsearch
-
-set tabstop=2
-set shiftwidth=2
-set softtabstop=2
-set expandtab
 
 " ctags
 set tags=tags;/
@@ -85,5 +84,19 @@ autocmd FileType python imap <buffer> <leader>x <esc>:w<CR>:exec '!python3' shel
 let g:python_recommended_style = 0
 au Filetype python setlocal ts=2 sts=0 sw=2
 
-" save with sudo using w!!
-cmap w!! w !sudo tee > /dev/null %
+let g:ycm_clangd_binary_path = "/opt/homebrew/opt/llvm/bin/clangd"
+"let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_global_extra_conf.py'
+let g:ycm_max_diagnostics_to_display = 0
+let g:ycm_autoclose_preview_window_after_insertion = 1
+"let g:ycm_confirm_extra_conf = 1
+
+nnoremap <leader>gt :YcmCompleter GoTo<CR>
+nnoremap <leader>fi :YcmCompleter FixIt<CR>
+nnoremap <leader>gd :YcmCompleter GetDoc<CR>
+nnoremap <leader>gtp :YcmCompleter GetType<CR>
+nnoremap <leader>gp :YcmCompleter GetParent<CR>
+nnoremap <leader>gti :YcmCompleter GoToInclude<CR>
+nnoremap <leader>gdf :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>gdc :YcmCompleter GoToDeclaration<CR>
+
+autocmd BufWritePre *.h,*.hpp,*.c,*.cpp,*.hh,*cc YcmCompleter Format
