@@ -36,10 +36,15 @@ syntax on
 set encoding=utf-8
 set number
 set cursorline
+set autoindent
+set smartindent
+set autochdir
 set hlsearch
 set incsearch
 set mouse=a
 set backspace=indent,eol,start
+set wildmenu
+set wildignorecase
 set whichwrap+=<,>,[,]
 set tabstop=2
 set shiftwidth=2
@@ -67,6 +72,8 @@ noremap <silent><leader>; :nohlsearch<cr>
 
 map <Tab> <C-W>W:cd %:p:h<CR>:<CR>
 
+set foldmethod=indent
+set foldnestmax=2
 nnoremap <space> za
 vnoremap <space> zf
 
