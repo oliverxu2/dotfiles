@@ -27,6 +27,14 @@ alias tmux="tmux -2"
 alias tmuxls="ls $TMPDIR/tmux*/"
 alias k5='kill -9 %%'
 
-PS1='\[\e[1;33m\][\u@\h \W \t]\$\[\e[0m\] '
+source ~/z.sh
+unalias z 2> /dev/null
+z() {
+  if [[ -z "$*" ]]; then
+    cd "$(_z -l 2>&1 | tac | fzf | sed 's/^[0-9]* *//')"
+  else
+    _z "$@"
+  fi
+}
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
